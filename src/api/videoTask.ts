@@ -28,6 +28,18 @@ export function getVideoTaskList(
       videoSize: '48.2MB',
       duration: '01:15',
       validity: '0天'
+    },
+    {
+      taskId: 1003,
+      videoName: 'VR20260129003_V1.MP4',
+      houseId: 'VR20260129003',
+      createTime: '2026-01-28 12:00:00',
+      genStartTime: '2026-01-28 12:00:00',
+      genEndTime: '',
+      statusText: '生成失败',
+      videoSize: '-',
+      duration: '-',
+      validity: '-'
     }
   ];
   return Promise.resolve({ list: mockList, total: 25 });

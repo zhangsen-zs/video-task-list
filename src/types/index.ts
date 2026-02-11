@@ -36,3 +36,11 @@ export interface VideoTaskQueryParams {
   page?: number;
   pageSize?: number;
 }
+
+/** 系统配置表单 */
+export interface SystemConfigForm {
+  resolution: string;
+  bitrate: string;
+  fps: string;
+  format: string;
+}

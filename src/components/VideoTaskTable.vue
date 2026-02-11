@@ -22,11 +22,11 @@
       <el-table-column prop="validity" label="有效期" width="90" align="center" />
       <el-table-column label="操作" width="140" align="center" fixed="right">
         <template #default="{ row }">
-          <el-link type="primary" @click="$emit('view', row)">查看</el-link>
-          <el-link v-if="row.statusText === '生成成功'" type="primary" @click="$emit('download', row)">
-            下载
-          </el-link>
-          <el-link v-else type="primary" @click="$emit('regenerate', row)">重新生成</el-link>
+          <span v-if="row.statusText === '生成成功'" class="action-links">
+            <el-link type="primary" @click="$emit('view', row)">查看</el-link>
+            <el-link type="primary" @click="$emit('download', row)">下载</el-link>
+          </span>
+          <el-link v-else-if="row.statusText === '生成失败'" type="primary" @click="$emit('regenerate', row)">重新生成</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -79,6 +79,12 @@ defineEmits<{
 
 .data-table {
   margin-bottom: 0;
+}
+
+.action-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .pagination-wrap {
