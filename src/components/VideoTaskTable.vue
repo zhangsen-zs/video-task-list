@@ -2,25 +2,17 @@
   <div class="table-wrapper">
     <div class="table-scroll">
       <el-table :data="data" border stripe class="data-table">
-      <el-table-column prop="taskId" label="任务ID" width="90" align="center" />
-      <el-table-column prop="videoName" label="视频名称" min-width="180">
-        <template #default="{ row }">
-          <el-link type="primary">{{ row.videoName }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="houseId" label="关联房源ID" width="140">
-        <template #default="{ row }">
-          <el-link type="primary">{{ row.houseId }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="170" align="center" />
-      <el-table-column prop="genStartTime" label="生成开始时间" width="170" align="center" />
-      <el-table-column prop="genEndTime" label="生成结束时间" width="170" align="center" />
-      <el-table-column prop="statusText" label="生成状态" width="100" align="center" />
-      <el-table-column prop="videoSize" label="视频大小" width="90" align="center" />
-      <el-table-column prop="duration" label="时长" width="80" align="center" />
-      <el-table-column prop="validity" label="有效期" width="90" align="center" />
-      <el-table-column label="操作" width="140" align="center" fixed="right">
+      <el-table-column prop="taskId" label="任务ID" min-width="70" align="center" />
+      <el-table-column prop="videoName" label="视频名称" min-width="140" show-overflow-tooltip />
+      <el-table-column prop="houseId" label="关联房源ID" min-width="120" />
+      <el-table-column prop="createTime" label="创建时间" min-width="155" align="center" />
+      <el-table-column prop="genStartTime" label="生成开始时间" min-width="155" align="center" />
+      <el-table-column prop="genEndTime" label="生成结束时间" min-width="155" align="center" />
+      <el-table-column prop="statusText" label="生成状态" min-width="90" align="center" />
+      <el-table-column prop="videoSize" label="视频大小" min-width="85" align="center" />
+      <el-table-column prop="duration" label="时长" min-width="70" align="center" />
+      <el-table-column prop="validity" label="有效期" min-width="80" align="center" />
+      <el-table-column label="操作" min-width="120" align="center" fixed="right">
         <template #default="{ row }">
           <span v-if="row.statusText === '生成成功'" class="action-links">
             <el-link type="primary" @click="$emit('view', row)">查看</el-link>
@@ -79,6 +71,7 @@ defineEmits<{
 
 .data-table {
   margin-bottom: 0;
+  width: 100% !important;
 }
 
 .action-links {
