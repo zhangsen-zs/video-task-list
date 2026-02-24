@@ -11,7 +11,7 @@
       <el-table-column prop="statusText" label="生成状态" min-width="90" align="center" />
       <el-table-column prop="videoSize" label="视频大小" min-width="85" align="center" />
       <el-table-column prop="duration" label="时长" min-width="70" align="center" />
-      <el-table-column prop="validity" label="有效期" min-width="80" align="center" />
+      <el-table-column prop="validity" label="数据状态" min-width="80" align="center" />
       <el-table-column label="操作" min-width="120" align="center" fixed="right">
         <template #default="{ row }">
           <span v-if="row.statusText === '生成成功'" class="action-links">

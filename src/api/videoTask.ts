@@ -15,7 +15,7 @@ export function getVideoTaskList(
       statusText: '生成成功',
       videoSize: '56.1MB',
       duration: '01:22',
-      validity: '30天'
+      validity: '有效'
     },
     {
       taskId: 1002,
@@ -27,7 +27,7 @@ export function getVideoTaskList(
       statusText: '生成成功',
       videoSize: '48.2MB',
       duration: '01:15',
-      validity: '0天'
+      validity: '无效'
     },
     {
       taskId: 1003,
@@ -39,7 +39,7 @@ export function getVideoTaskList(
       statusText: '生成失败',
       videoSize: '-',
       duration: '-',
-      validity: '-'
+      validity: '无效'
     }
   ];
   return Promise.resolve({ list: mockList, total: 25 });
