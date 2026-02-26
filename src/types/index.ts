@@ -44,3 +44,9 @@ export interface SystemConfigForm {
   fps: string;
   format: string;
 }
+
+/** 列表接口通用返回 */
+export interface ListResult<T> {
+  list: T[];
+  total: number;
+}

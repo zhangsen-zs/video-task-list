@@ -1,7 +1,7 @@
 <template>
   <div class="table-wrapper">
     <div class="table-scroll">
-      <el-table :data="data" border stripe class="data-table">
+      <el-table :data="data" border stripe class="data-table" :loading="loading">
       <el-table-column prop="taskId" label="任务ID" min-width="70" align="center" />
       <el-table-column prop="videoName" label="视频名称" min-width="140" show-overflow-tooltip />
       <el-table-column prop="houseId" label="关联房源ID" min-width="120" />
@@ -44,6 +44,7 @@ import type { VideoTask, PaginationParams } from '@/types';
 defineProps<{
   data: VideoTask[];
   pagination: PaginationParams;
+  loading?: boolean;
 }>();
 
 defineEmits<{

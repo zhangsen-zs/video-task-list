@@ -14,6 +14,7 @@
           <VideoTaskTable
             :data="tableData"
             :pagination="pagination"
+            :loading="listLoading"
             @update:current-page="handlePageChange"
             @update:page-size="handlePageSizeChange"
             @view="handleView"
@@ -56,7 +57,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showSystemConfig = false">取消</el-button>
-        <el-button type="primary" @click="handleSystemConfigConfirm">确认</el-button>
+        <el-button type="primary" :loading="configSubmitting" @click="handleSystemConfigConfirm">确认</el-button>
       </template>
     </el-dialog>
 
@@ -103,18 +104,20 @@
       <p class="regenerate-message">确认重新生成当前视频吗?</p>
       <template #footer>
         <el-button @click="showRegenerateConfirm = false">取消</el-button>
-        <el-button type="primary" @click="handleRegenerateConfirm">确认</el-button>
+        <el-button type="primary" :loading="regenerateLoading" @click="handleRegenerateConfirm">确认</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 import PageHeader from '@/components/PageHeader.vue';
 import VideoTaskFilter from '@/components/VideoTaskFilter.vue';
 import VideoTaskTable from '@/components/VideoTaskTable.vue';
-import { getVideoTaskList } from '@/api/videoTask';
+import { getVideoTaskList, regenerateTask } from '@/api/videoTask';
+import { getSystemConfig, submitSystemConfig } from '@/api/settings';
 import type { FilterForm, VideoTask, PaginationParams, SystemConfigForm } from '@/types';
 
 const filterForm = reactive<FilterForm>({
@@ -152,10 +155,30 @@ const handleSystemConfigClose = () => {
   Object.assign(systemConfigForm, defaultSystemConfig);
 };
 
-const handleSystemConfigConfirm = () => {
-  // 实际项目中在此提交配置到后端
-  showSystemConfig.value = false;
-  Object.assign(systemConfigForm, defaultSystemConfig);
+watch(showSystemConfig, async (visible) => {
+  if (visible) {
+    try {
+      const config = await getSystemConfig();
+      Object.assign(systemConfigForm, config);
+    } catch (e) {
+      ElMessage.error((e as Error).message || '获取配置失败');
+    }
+  }
+});
+
+const configSubmitting = ref(false);
+const handleSystemConfigConfirm = async () => {
+  configSubmitting.value = true;
+  try {
+    await submitSystemConfig(systemConfigForm);
+    ElMessage.success('配置已保存');
+    showSystemConfig.value = false;
+    Object.assign(systemConfigForm, defaultSystemConfig);
+  } catch (e) {
+    ElMessage.error((e as Error).message || '保存配置失败');
+  } finally {
+    configSubmitting.value = false;
+  }
 };
 
 // 查看视频弹窗
@@ -190,22 +213,39 @@ const handleRegenerate = (row: VideoTask) => {
   showRegenerateConfirm.value = true;
 };
 
-const handleRegenerateConfirm = () => {
+const regenerateLoading = ref(false);
+const handleRegenerateConfirm = async () => {
   if (!regeneratingTask.value) return;
-  // 实际项目中在此调用重新生成接口
-  showRegenerateConfirm.value = false;
-  regeneratingTask.value = null;
-  loadData();
+  regenerateLoading.value = true;
+  try {
+    await regenerateTask(regeneratingTask.value.taskId);
+    ElMessage.success('已提交重新生成');
+    showRegenerateConfirm.value = false;
+    regeneratingTask.value = null;
+    await loadData();
+  } catch (e) {
+    ElMessage.error((e as Error).message || '重新生成失败');
+  } finally {
+    regenerateLoading.value = false;
+  }
 };
 
+const listLoading = ref(false);
 const loadData = async () => {
-  const res = await getVideoTaskList({
-    ...filterForm,
-    page: pagination.currentPage,
-    pageSize: pagination.pageSize
-  });
-  tableData.value = res.list;
-  pagination.total = res.total;
+  listLoading.value = true;
+  try {
+    const res = await getVideoTaskList({
+      ...filterForm,
+      page: pagination.currentPage,
+      pageSize: pagination.pageSize
+    });
+    tableData.value = Array.isArray(res?.list) ? res.list : [];
+    pagination.total = res?.total ?? 0;
+  } catch (e) {
+    ElMessage.error((e as Error).message || '加载列表失败');
+  } finally {
+    listLoading.value = false;
+  }
 };
 
 const handleClear = () => {
@@ -221,11 +261,13 @@ const handleQuery = () => {
 };
 
 const handlePageChange = (page: number) => {
+  if (page === pagination.currentPage) return;
   pagination.currentPage = page;
   loadData();
 };
 
 const handlePageSizeChange = (size: number) => {
+  if (size === pagination.pageSize) return;
   pagination.pageSize = size;
   pagination.currentPage = 1;
   loadData();
