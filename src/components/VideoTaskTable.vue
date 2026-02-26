@@ -1,7 +1,7 @@
 <template>
   <div class="table-wrapper">
     <div class="table-scroll">
-      <el-table :data="data" border stripe class="data-table" :loading="loading">
+      <el-table :data="tableData" border stripe class="data-table" :loading="loading">
       <el-table-column prop="taskId" label="任务ID" min-width="70" align="center" />
       <el-table-column prop="videoName" label="视频名称" min-width="140" show-overflow-tooltip />
       <el-table-column prop="houseId" label="关联房源ID" min-width="120" />
@@ -26,34 +26,48 @@
 
     <div class="pagination-wrap">
       <el-pagination
-        :current-page="pagination.currentPage"
-        :page-size="pagination.pageSize"
+        v-model:current-page="currentPageModel"
+        v-model:page-size="pageSizeModel"
         :page-sizes="[10, 20, 50, 100]"
         :total="pagination.total"
         layout="sizes, prev, pager, next, jumper"
-        @update:current-page="$emit('update:currentPage', $event)"
-        @update:page-size="$emit('update:pageSize', $event)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { VideoTask, PaginationParams } from '@/types';
 
-defineProps<{
-  data: VideoTask[];
-  pagination: PaginationParams;
-  loading?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    data?: VideoTask[];
+    pagination: PaginationParams;
+    loading?: boolean;
+  }>(),
+  { data: () => [] }
+);
 
-defineEmits<{
+const emit = defineEmits<{
   view: [row: VideoTask];
   download: [row: VideoTask];
   regenerate: [row: VideoTask];
   'update:currentPage': [value: number];
   'update:pageSize': [value: number];
 }>();
+
+const tableData = computed(() => props.data ?? []);
+
+const currentPageModel = computed({
+  get: () => props.pagination.currentPage,
+  set: (v: number) => emit('update:currentPage', v)
+});
+
+const pageSizeModel = computed({
+  get: () => props.pagination.pageSize,
+  set: (v: number) => emit('update:pageSize', v)
+});
 </script>
 
 <style scoped>
